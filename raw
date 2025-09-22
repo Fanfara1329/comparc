@@ -122,7 +122,7 @@ void solve() {
     for (auto &a: argv) {
         cin >> a;
     }
-    if (argc == 4) {
+    if (argc == 4) {   
         string fd = argv[1], sd = argv[2], td = argv[3];
         int A = stoi(fd.substr(0, fd.find('.'))), B = stoi(fd.substr(fd.find('.') + 1, fd.size()));
         uint64_t num = 0;
@@ -132,15 +132,15 @@ void solve() {
         num <<= (64 - A - B);
         num >>= (64 - A - B);
         bitset<64> h(num);
-        cout << h << "\n";
+        //cout << h << "\n";
         //cout << b << "   " << bb << "\n";;
         bool f = checks(num, A + B - 1);
         if (f) num = conve(num, A + B);
         num = num * MAX / (1 << B);
         bitset<64> b(num);
-        cout << b << "      " << num << "\n";
+        //cout << b << "      " << num << "\n";
         num = rounds(num, stoi(sd), f);
-        cout << num << "    newnum\n";
+        //cout << num << "    newnum\n";
         print(num, f);
     } else if (argc == 6) {
         cout << "lkjhg\n";
