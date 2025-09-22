@@ -1,0 +1,245 @@
+#include <iostream>
+#include <string>
+#include <cstdint>
+#include <math.h>
+#include <bitset>
+#include <limits>
+#include <vector>
+
+using namespace std;
+
+uint64_t MU = 0xffffffffffff, MU1 = 0xffffffffffff, MU2 = 0xffffffffffff;
+long long MAX = 10000;
+
+int parseHex(char o) {
+    if ('0' <= o && o <= '9') {
+        return o - '0';
+    }
+    if ('A' <= o && o <= 'Z') {
+        return o - 'A' + 10;
+    }
+    if ('a' <= o && o <= 'z') {
+        return o - 'a' + 10;
+    }
+}
+
+uint64_t conve(uint64_t a, int AB) {
+    bitset<64> b(a);
+    //cout << b << "\n";
+    bool f = 0;
+    for (int i = 0; i < AB; i++) {
+        if (f) {
+            b[i] = !b[i];
+        }
+        if (b[i] == 1) {
+            f = 1;
+        }
+    }
+    //cout << b << " sedrftgygytrewwrtfhjterw\n";
+    return (uint64_t) (b.to_ulong());
+}
+
+bool checks(uint64_t n, int AB) {
+    bitset<64> b(n);
+    if (b[AB]) return 1;
+    else return 0;
+}
+
+uint64_t roundu(uint64_t n) {
+    if (n % 10 < 5) {
+        return n / 10;
+    } else {
+        return n / 10 + 1;
+    }
+}
+
+uint64_t rounds(uint64_t n, int sign, bool f) {
+    if (sign == 0) {
+        return n / 10;
+    } else if (sign == 1) {
+        if (n % 10 == 5) {
+            return (n / 10 + 1) / 2 * 2;
+        } else {
+            if (n % 10 < 5) return n / 10;
+            else return n / 10 + 1;
+        }
+    } else if (sign == 2) {
+        if (f) {
+            return n / 10;
+        } else {
+            return roundu(n);
+        }
+    } else {
+        if (f) { return roundu(n); } else {
+            return n / 10;
+        }
+    }
+}
+
+
+void print(uint64_t n, bool f) {
+    string s = to_string(n);
+    if (f) cout << "-";
+    cout << s.substr(0, s.size() - 3) << '.' << s.substr(s.size()-3,3)<< "\n";
+}
+
+// bool 1 - minus
+
+pair<bool, uint64_t> comp(uint64_t n1, uint64_t n2, bool f1, bool f2, string s, int B) {
+    bool f = 0;
+    uint64_t n = 0;
+    if (n1 < n2) {
+        swap(n1, n2);
+        swap(f1, f2);
+    }
+    cout << n1 << "   " << f1 << "   ___   " << n2 << "   " << f2 << "    sign:" << s << "\n";
+    if (s == "*") {
+        f = (f1 ^ f2);
+        n = (n1 * n2) / (1 << B);
+    } else {
+        cout << "   tepertut\n";
+    }
+    return {f, n};
+}
+
+uint64_t comp1(uint64_t n1, uint64_t n2, string s) {
+    if (s == "+") {
+        return n1 + n2;
+    } else if (s == "-") {
+        return n1;
+    }
+}
+
+bool checkdeb(uint64_t n, int AB) {
+    if (n / (1 << AB)) return 1;
+    else return 0;
+}
+
+void solve() {
+    int argc;
+    cin >> argc;
+    vector<string> argv(argc);
+    for (auto &a: argv) {
+        cin >> a;
+    }
+    if (argc == 4) {
+        string fd = argv[1], sd = argv[2], td = argv[3];
+        int A = stoi(fd.substr(0, fd.find('.'))), B = stoi(fd.substr(fd.find('.') + 1, fd.size()));
+        uint64_t num = 0;
+        for (int i = 2; i < td.size(); i++) {
+            num = num * 16 + parseHex(td[i]);
+        }
+        num <<= (64 - A - B);
+        num >>= (64 - A - B);
+        bitset<64> h(num);
+        cout << h << "\n";
+        //cout << b << "   " << bb << "\n";;
+        bool f = checks(num, A + B - 1);
+        if (f) num = conve(num, A + B);
+        num = num * MAX / (1 << B);
+        bitset<64> b(num);
+        cout << b << "      " << num << "\n";
+        num = rounds(num, stoi(sd), f);
+        cout << num << "    newnum\n";
+        print(num, f);
+    } else if (argc == 6) {
+        cout << "lkjhg\n";
+        /*string fd = argv[1], fod = argv[4], fivd = argv[5], secd = argv[3], trd = argv[2];
+        int A = stoi(fd.substr(0, fd.find('.'))), B = stoi(fd.substr(fd.find('.') + 1, fd.size()));
+        uint64_t num1 = 0, num2 = 0;
+        for (int i = 2; i < fod.size(); i++) {
+            num1 = num1 * 16 + parseHex(fod[i]);
+        }
+        for (int i = 2; i < fivd.size(); i++) {
+            num2 = num2 * 16 + parseHex(fivd[i]);
+        }
+        if (secd == "/" && checkdeb(num2, A + B)) {
+            cout << "div_by_zero";
+            return;
+        }
+        if (secd == "+" || secd == "-") {
+
+        } else {
+            bool f1 = checks(num1, A + B - 1), f2 = checks(num2, A + B - 1);
+            if (f1) num1 = conve(num1, A + B);
+            if (f2) num2 = conve(num2, A + B);
+            num1 = num1 * MAX / (1 << B);
+            num2 = num2 * MAX / (1 << B);
+            cout << num1 << "     " << num2 << "\n";
+            pair<bool, uint64_t> m = comp(num1, num2, f1, f2, secd, B);
+            cout << "lkjhgfdsdfghjk\n";
+            m.second = rounds(m.second, stoi(trd), m.first);
+            print(m.second, m.first);
+        }*/
+    }
+}
+
+int main() {
+    int n;
+    cin >> n;
+    for (int i = 0; i < n; i++) solve();
+}
+
+/*int main() {
+    bitset<5> bnum(8);
+    cout << bnum << endl;
+    string td = "0x17360";
+    uint64_t num = 0;
+    int b = 12;
+    for (int i = 2; i < td.size(); i++) {
+        num = num * 16 + parseHex(td[i]);
+    }
+    MU = (MU << 28) + num;
+    bitset<64> j(MU);
+    //cout << j << "\n";;
+    //cout << MU << endl;
+    bitset<64> m(MU * MAX / (1 << b));
+    bitset<64> nuuum(num * MAX / (1 << b));
+    cout << MU * MAX / (1 << 12) << "     " << m <<  "\n" << num * MAX / (1 << b) << "    " << nuuum;
+    //bitset<64> num1(num);
+    //bitset<64> k(2109375);
+    //cout << num * MAX / (1 << b) << "\n" << num1 << "   " << nuuum << " " << k;
+    //
+}
+
+/*int main(int argc, char *argv[]) {
+    cout << argc + 5;
+    if (argc == 4) {
+        string fd = argv[1], td = argv[3];
+        int A = stoi(fd.substr(0, fd.find('.'))), B = stoi(fd.substr(fd.find('.') + 1, fd.size()));
+        uint64_t num = 0;
+        for (int i = 2; i < td.size(); i++) {
+            num = num * 16 + parseHex(td[i]);
+        }
+        MU = (MU >> (A + B)) + num;
+    } else if (argc == 6) {
+        string fd = argv[1], fod = argv[4], fivd = argv[5];
+        int A = stoi(fd.substr(0, fd.find('.'))), B = stoi(fd.substr(fd.find('.') + 1, fd.size()));
+        uint64_t num1 = 0, num2 = 0;
+        for (int i = 2; i < fod.size(); i++) {
+            num1 = num1 * 16 + parseHex(fod[i]);
+        }
+        for (int i = 2; i < fivd.size(); i++) {
+            num2 = num2 * 16 + parseHex(fivd[i]);
+        }
+        MU1 = (MU1 >> (A + B)) + num1;
+        MU2 = (MU2 >> (A + B)) + num2;
+    }
+}*/
+
+
+/*
+* 68719476735
+95072255
+95072
+ */
+
+// 6 jhgf 8.8 1 + 0xdc9f 0xd736
+// 4 nbvcx 8.8 1 0xdc9f
+// 4 hgfd 8.8 1 0xd736
+
+// 4.4 3 / 0x12 0x100
+// 4 goiu 4.4 3 0x12
+// 4 lkjh 4.4 3 0x100
+
+//4 fd 25.6 0 0x209666b5
