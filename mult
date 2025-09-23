@@ -1,0 +1,12 @@
+uint64_t a = 15795, b = 3354, c = a * b;
+    int A = 14, B = 2;
+    bitset<64> ba(a), bb(b), bc(c);
+    c <<= (64 - A - 2 * B);
+    c >>= (64 - A - B);
+    bitset<64> nc(c);
+    cout << ba << "\n" << bb << "\n" << bc << "\n" << nc << "\n" << c << "     cccccc";
+    // 4 fd 14.2  3 0x13db3
+    // 4 fd 14.2  3 0xd1a
+    // 4 gf 10.9 3 0x60ccc
+    // 4 gfd 10.9 3 0xfb5b2
+    // 57.281
