@@ -1,0 +1,21 @@
+      if (argc == 4) {
+        string fd = argv[1], sd = argv[2], td = argv[3];
+        int A = stoi(fd.substr(0, fd.find('.'))), B = stoi(fd.substr(fd.find('.') + 1, fd.size()));
+        uint64_t num = 0;
+        ParseNumber(td, num);
+        //bitset<64> bit1(num);
+        num <<= (64 - A - B);
+        num >>= (64 - A - B);
+        //bitset<64> bit2(num);
+        //cout << num << "    num\n";
+        //cout << bit1 << "    firstbit\n" << bit2 << "    secondbit\n";
+        bool f = checks(num, A + B - 1);
+        //bitset<64> g(num);
+        //cout << g << "\n";
+        if (f) num = conve(num, A + B);
+        uint64_t rem = num * MAX % (1 << B);
+        num = num * MAX / (1 << B);
+        if (rem < 0) rem = -rem;
+        num = rounds(num, stoi(sd), f, rem, B - 1);
+        print(num, f);
+    } 
