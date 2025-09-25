@@ -11,7 +11,6 @@
 
 using namespace std;
 
-uint64_t MU = 0xffffffffffff, MU1 = 0xffffffffffff, MU2 = 0xffffffffffff;
 long long MAX = 1000, MAX1 = 10000;
 
 int parseHex(char o) {
@@ -34,7 +33,6 @@ void ParseNumber(string s, uint64_t &num) {
 
 uint64_t conve(uint64_t a, int AB) {
     bitset<64> b(a);
-    //cout << b << "\n";
     bool f = 0;
     for (int i = 0; i < AB; i++) {
         if (f) {
@@ -44,7 +42,7 @@ uint64_t conve(uint64_t a, int AB) {
             f = 1;
         }
     }
-    //cout << b << " sedrftgygytrewwrtfhjterw\n";
+    cout << b << "     bitset\n";
     return (uint64_t) (b.to_ulong());
 }
 
@@ -53,20 +51,10 @@ bool checks(uint64_t n, int AB) {
     return b[AB];
 }
 
-uint64_t roundu(uint64_t n) {
-    if (n % 10 < 5) {
-        return n / 10;
-    } else {
-        return n / 10 + 1;
-    }
-}
-
 uint64_t rounds(uint64_t n, int sign, bool f, uint64_t r, int B) {
-    //cout << n << "   ___n\n";
     if (sign == 0) {
         return n;
     } else if (sign == 1) {
-        // возможно чето нето
         if (r > (1 << B)) {
             return n + 1;
         } else if (r == (1 << B)) {
@@ -75,7 +63,6 @@ uint64_t rounds(uint64_t n, int sign, bool f, uint64_t r, int B) {
             }
         }
     } else if (sign == 2) {
-        //cout << n << "   " << r <<  "   rn\n";
         if (!f && r) {
             return n + 1;
         }
@@ -83,13 +70,9 @@ uint64_t rounds(uint64_t n, int sign, bool f, uint64_t r, int B) {
         if (f && r) return n + 1;
     }
     return n;
-    //4 fd 6.7 1 0x1ef7   -2.070
-    //4 re 2.6 1 0xc2  -0.969
 }
 
-
 void print(uint64_t n, bool f) {
-    cout << n << "     ___n\n";
     string s = to_string(n);
     if (!n) {
         cout << "0.000\n";
@@ -108,132 +91,15 @@ void print(uint64_t n, bool f) {
     cout << a << '.' << s.substr(s.size() - 3, 3) << "\n";
 }
 
-// bool 1 - minus
-
-pair<bool, uint64_t> comp(uint64_t n1, uint64_t n2, bool f1, bool f2, string s, int B) {
-    // вроде не юзаю
-    bool f = 0;
-    uint64_t n = 0;
-    if (n1 < n2) {
-        swap(n1, n2);
-        swap(f1, f2);
-    }
-    cout << n1 << "   " << f1 << "   ___   " << n2 << "   " << f2 << "    sign:" << s << "\n";
-    if (s == "*") {
-        f = (f1 ^ f2);
-        n = (n1 * n2) / (1 << B);
-    } else {
-        cout << "   tepertut\n";
-    }
-    return {f, n};
-} // вроде не юзаю
-
-uint64_t comp1(uint64_t n1, uint64_t n2, string s) {
-    if (s == "+") {
-        return n1 + n2;
-    } else if (s == "-") {
-        return n1;
-    }
-} // тож не юзаю
-
 bool checkdeb(uint64_t n, int AB) {
     return n / (1 << AB);
 }
 
-void solve() {
-    ofstream out("tyui");
-    int argc;
-    cin >> argc;
-    vector<string> argv(argc);
-    for (auto &a: argv) {
-        cin >> a;
-    }
-    if (argc == 4) {
-        string fd = argv[1], sd = argv[2], td = argv[3];
-        int A = stoi(fd.substr(0, fd.find('.'))), B = stoi(fd.substr(fd.find('.') + 1, fd.size()));
-        uint64_t num = 0;
-        for (int i = 2; i < td.size(); i++) {
-            num = num * 16 + parseHex(td[i]);
-        }
-        bitset<64> bit1(num);
-        num <<= (64 - A - B);
-        num >>= (64 - A - B);
-        bitset<64> bit2(num);
-        cout << num << "    num\n";
-        cout << bit1 << "    firstbit\n" << bit2 << "    secondbit\n";
-        bool f = checks(num, A + B - 1);
-        if (f) num = conve(num, A + B);
-        uint64_t rem = num * MAX % (1 << B);
-        num = num * MAX / (1 << B);
-        if (rem < 0) rem = -rem;
-        num = rounds(num, stoi(sd), f, rem, B - 1);
-        //print(num, f);
-        if (!num) {
-            out << "0.000\n";
-            return;
-        }
-        //cout << n << "     ___n\n";
-        string s = to_string(num);
-        if (f) out << "-";
-        string a = s.substr(0, s.size() - 3);
-        if (s.size() == 3) a = "0";
-        out << a << '.' << s.substr(s.size() - 3, 3) << "\n";
-    } else if (argc == 6) {
-        string fd = argv[1], fod = argv[4], fivd = argv[5], secd = argv[3], trd = argv[2];
-        int A = stoi(fd.substr(0, fd.find('.'))), B = stoi(fd.substr(fd.find('.') + 1, fd.size()));
-        uint64_t num1 = 0, num2 = 0;
-        for (int i = 2; i < fod.size(); i++) {
-            num1 = num1 * 16 + parseHex(fod[i]);
-        }
-        for (int i = 2; i < fivd.size(); i++) {
-            num2 = num2 * 16 + parseHex(fivd[i]);
-        }
-        if (secd == "/" && checkdeb(num2, A + B)) {
-            cout << "div_by_zero";
-            return;
-        }
-        if (secd == "+" || secd == "-") {
-            uint64_t num = 0;
-            if (secd == "+") { num = num1 + num2; } else { num = num1 - num2; }
-            num <<= (64 - A - B);
-            num >>= (64 - A - B);
-            bool f = checks(num, A + B - 1);
-            if (f) num = conve(num, A + B);
-            int rem = num * MAX % (1 << B);
-            num = num * MAX / (1 << B);
-            num = rounds(num, stoi(trd), f, rem, B - 1);
-            if (!num) {
-                out << "0.000\n";
-                return;
-            }
-            //cout << n << "     ___n\n";
-            string s = to_string(num);
-            if (f) out << "-";
-            string a = s.substr(0, s.size() - 3);
-            if (s.size() == 3) a = "0";
-            out << a << '.' << s.substr(s.size() - 3, 3) << "\n";
-        } else {
-            if (secd == "*") {
-            }
-            /*bool f1 = checks(num1, A + B - 1), f2 = checks(num2, A + B - 1);
-            if (f1) num1 = conve(num1, A + B);
-            if (f2) num2 = conve(num2, A + B);
-            num1 = num1 * MAX / (1 << B);
-            num2 = num2 * MAX / (1 << B);
-            cout << num1 << "     " << num2 << "\n";
-            pair<bool, uint64_t> m = comp(num1, num2, f1, f2, secd, B);
-            cout << "lkjhgfdsdfghjk\n";
-            m.second = rounds(m.second, stoi(trd), m.first);
-            print(m.second, m.first);*/
-        }
-    }
-}
-
-int yt() {
+int tr() {
     ofstream out; // поток для записи
     out.open("anshjk.txt");
     ifstream in("test.txt");
-    for (int i = 0; i < 74985; i++) {
+    for (int i = 0; i < 12; i++) {
         string s;
         getline(in, s);
         //cout << s << "\n";
@@ -334,8 +200,36 @@ int yt() {
                 string a = s.substr(0, s.size() - 3);
                 out << a << '.' << s.substr(s.size() - 3, 3) << "\n";
             } else {
-                if (secd == "*") {
-                    cout << "gfd";
+                if (secd == "!") {
+                    bool f1 = checks(num1, A + B - 1), f2 = checks(num2, A + B - 1), f = (f1 + f2) % 2;;
+                    if (f1) num1 = conve(num1, A + B);
+                    if (f2) num2 = conve(num2, A + B);
+                    uint64_t num = num1 * num2;
+                    num <<= (64 - A - 2 * B);
+                    num >>= (64 - A - B);
+                    if (f) num = conve(num, A + B);
+                    uint64_t rem = num * MAX % (1 << B);
+                    num = num * MAX;
+                    num >>= B;
+                    bool f3 = checks(num, A + B - 1);
+                    //if (rem < 0) rem = -rem;
+                    num = rounds(num, stoi(trd), f, rem, B - 1);
+                    s = to_string(num);
+                    if (!num) {
+                        out << "0.000\n";
+                        continue;
+                    }
+                    if (f) out << '-';
+                    if (s.size() <= 3) {
+                        out << "0.";
+                        for (int i = 0; i < 3 - s.size(); i++) {
+                            out << '0';
+                        }
+                        out << s << "\n";
+                        continue;
+                    }
+                    string a = s.substr(0, s.size() - 3);
+                    out << a << '.' << s.substr(s.size() - 3, 3) << "\n";
                 }
                 /*bool f1 = checks(num1, A + B - 1), f2 = checks(num2, A + B - 1);
                 if (f1) num1 = conve(num1, A + B);
@@ -362,21 +256,23 @@ int main(int argc, char *argv[]) {
         num >>= (64 - A - B);
         bool f = checks(num, A + B - 1);
         if (f) num = conve(num, A + B);
-        cout << f << "   minus\n";
-        cout << num << "  " << num * MAX << "  " << num * MAX % (1 << B) << "  " << num * MAX / (1 << B) << "   " << (
-            1 << (B - 1)) << "  ytrew\n";
         uint64_t rem = num * MAX % (1 << B);
         num = num * MAX;
         num >>= B;
-        if (rem < 0) rem = -rem;
+        //if (rem < 0) rem = -rem;
         num = rounds(num, stoi(roundnum), f, rem, B - 1);
         print(num, f);
+        cout << rem << "   rem   " << (1 << (B - 1));
     } else if (argc == 6) {
-        string AB = argv[2], sign = argv[4], firstnum = argv[5], secondnum = argv[6], roundnum = argv[3];
+        string AB = argv[1], sign = argv[3], firstnum = argv[4], secondnum = argv[5], roundnum = argv[2];
         int A = stoi(AB.substr(0, AB.find('.'))), B = stoi(AB.substr(AB.find('.') + 1, AB.size()));
         uint64_t num1 = 0, num2 = 0;
         ParseNumber(firstnum, num1);
         ParseNumber(secondnum, num2);
+        num1 <<= (64 - A - B);
+        num1 >>= (64 - A - B);
+        num2 <<= (64 - A - B);
+        num2 >>= (64 - A - B); // это возможно не нужно
         if (sign == "/" && checkdeb(num2, A + B)) {
             cout << "div_by_zero";
             return 0;
@@ -388,55 +284,55 @@ int main(int argc, char *argv[]) {
             num >>= (64 - A - B);
             bool f = checks(num, A + B - 1);
             if (f) num = conve(num, A + B);
-            int rem = num * MAX % (1 << B);
+            uint64_t rem = num * MAX % (1 << B);
             num = num * MAX;
             num >>= B;
+            //if (rem < 0) rem = -rem;
             num = rounds(num, stoi(roundnum), f, rem, B - 1);
             print(num, f);
+            cout << rem << "   rem\n";
         } else {
-            if (sign == "*") {
+            if (sign == "!") {
+                bool f1 = checks(num1, A + B - 1), f2 = checks(num2, A + B - 1), f = (f1 + f2) % 2;;
+                if (f1) num1 = conve(num1, A + B);
+                if (f2) num2 = conve(num2, A + B);
+                uint64_t num = num1 * num2;
+                num <<= (64 - A - 2 * B);
+                num >>= (64 - A - B);
+                if (f) num = conve(num, A + B);
+                uint64_t rem = num * MAX % (1 << B);
+                num = num * MAX;
+                num >>= B;
+                bool f3 = checks(num, A + B - 1);
+                //if (rem < 0) rem = -rem;
+                num = rounds(num, stoi(roundnum), f, rem, B - 1);
+                cout << f << "   "<< f3 << "     pos or neg\n";
+                print(num, f3);
             } else {
-                
+                bool f1 = checks(num1, A + B - 1), f2 = checks(num2, A + B - 1), f = (f1 + f2) % 2;//f = f1*f2;//f = (f1 + f2) % 2;;
+                num1 <<= B;
+                uint64_t num = num1 / num2;
+                num <<= (64 - A - 2 * B);
+                num >>= (64 - A - B);
+                //if (f) num = conve(num, A + B);
+                uint64_t rem = num * MAX % (1 << B);
+                num = num * MAX;
+                num >>= B;
+                bool f3 = checks(num, A + B - 1);
+                //if (rem < 0) rem = -rem;
+                num = rounds(num, stoi(roundnum), f, rem, B - 1);
+                cout << f << "   "<< f3 << "     pos or neg\n";
+                print(num, f3);
             }
         }
     }
 }
 
-// 14.16 2 - 0x3c40920d 0x71a0b185
+// 01101100111100110
+// remains не надо abs, возможно не надо uint64_t
 
-/*
-* 68719476735
-95072255
-95072
- */
-
-// 6 jhgf 8.8 1 + 0xdc9f 0xd736
-// 4 nbvcx 8.8 1 0xdc9f
-// 4 hgfd 8.8 1 0xd736
-
-// 4.4 3 / 0x12 0x100
-// 4 goiu 4.4 3 0x12
-// 4 lkjh 4.4 3 0x100
-
-//4 fd 25.6 0 0x209666b5
-
-// 6 gf 8.8 2 + 0xdc9f 0xd736
-
-//4 sdfgh 10.9 3 0xfb5b2
-//6 hgfd 14.16 2 - 0x3c40920d 0x71a0b185
-//4 hg 25.6 2 0x209666b5
-
-
-//4 ghfd 4.1 2 0xa
-//4 gf 3.1 2 0xa
-
-
-// 14.2 3 ! 0x13db3 0xd1a // 1458.750  3948.750 838.500
-//10.9 3 ! 0x60ccc 0xfb5b2
-
-
-//22.4 0 / 0x6b97b58 0x3695427
-// 2.125
-
-// 4 fd 22.4 0 0x6b97b58   == -1337418.500
-// 4 fd 22.4 0 0x3695427 ==
+        /*bitset<64> b(num);
+        cout << b << "\n";
+        rem >>= 10;
+        bitset<64> b2(rem);
+        cout << b2 << "\n"; // это типо пиздатый сдвиг remains для 1.31*/
