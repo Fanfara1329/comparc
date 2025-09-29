@@ -99,6 +99,32 @@ uint64_t rounds1(uint64_t n, int sign, bool f, int B) {
     return n;
 }
 
+void round_div(uint64_t &num, uint64_t r, uint64_t num2, int sign, bool f) {
+    if (!sign) return;
+    else if (sign == 1) {
+        uint64_t t = r << 1;
+        if (t > num2) {
+            num++;
+            return;
+        }
+        if (t == num2 && (num && 1ULL)) {
+            num++;
+            return;
+        }
+    } else if (sign == 2) {
+        if (!f && r) {
+            num++;
+            return;
+        }
+        return;
+    }
+    if (f && r) {
+        num++;
+        return;
+    }
+    return;
+}
+
 void print(uint64_t n, bool f) {
     string s = to_string(n);
     if (!n) {
@@ -118,6 +144,11 @@ void print(uint64_t n, bool f) {
     cout << a << '.' << s.substr(s.size() - 3, 3) << "\n";
 }
 
+void bits(uint64_t n, string s) {
+    bitset<64> b(n);
+    cout << b << "   " << s << "\n";
+}
+
 void addsub(uint64_t &num1, uint64_t &num2, int A, int B, string roundnum, string sign) {
     uint64_t num = 0;
     if (sign == "+") { num = num1 + num2; } else { num = num1 - num2; }
@@ -131,24 +162,20 @@ void addsub(uint64_t &num1, uint64_t &num2, int A, int B, string roundnum, strin
     print(num, f);
 }
 
-
 void mult(uint64_t &num1, uint64_t &num2, int A, int B, string roundnum) {
     // check на минус
     bool f1 = checks(num1, A + B - 1), f2 = checks(num2, A + B - 1);
     if (f1) conve(num1, A + B);
     if (f2) conve(num2, A + B);
-    cout << f1 << "   " << f2 << "     flagi\n";
 
     // перемножение
     uint64_t num = num1 * num2;
 
     // проверка на минус
     bool f3 = (num >> (2 * B + 2 * A - 1)) % 2;
-    cout << f3 << "   flag1\n";
 
     // округление и вывод
-    num = rounds1(num, stoi(roundnum), f3, B);
-
+    num = rounds1(num, stoi(roundnum), f1 ^ f2, B);
 
     //убрали ненужную левую A
     num <<= (64 - A - B);
@@ -156,12 +183,10 @@ void mult(uint64_t &num1, uint64_t &num2, int A, int B, string roundnum) {
 
     // проверка на минус
     bool f = checks(num, A + B - 1);
-    if (f) conve(num, A + B );
-    cout << f << "   flag1\n";
-    bool c1 = f1^f2, c2 = c1^f3, c3 = c2^f;
-    cout << c1 << "   " << c2 << " " << c3 << "     \n";
-    num = rounds(num, stoi(roundnum), f3, B);
-    print(num, c3);
+    if (f) conve(num, A + B);
+    num = rounds(num, stoi(roundnum), f, B);
+    f = f1 ^ f2 ^ f;
+    print(num, f);
 }
 
 void division(uint64_t &num1, uint64_t &num2, int A, int B, string roundnum) {
@@ -177,7 +202,19 @@ void division(uint64_t &num1, uint64_t &num2, int A, int B, string roundnum) {
     if (f2) conve(num2, A + B);
 
 
-    uint64_t num = (num1 << B) / num2;
+    num1 <<= B;
+    uint64_t num = (uint64_t) (num1 / num2);
+    uint64_t r = (uint64_t) (num1 % num2);
+
+    round_div(num, r, num2, stoi(roundnum), f3);
+
+    num <<= (64 - A - B);
+    num >>= (64 - A - B);
+
+    bool f = checks(num, A + B - 1);
+    if (f) conve(num, A + B);
+
+    f3 = f3 ^ f;
 
     num = rounds(num, stoi(roundnum), f3, B);
     print(num, f3);
@@ -196,7 +233,6 @@ int main(int argc, char *argv[]) {
         // положительный или отрицательный
         bool f = checks(num, A + B - 1);
         if (f) conve(num, A + B);
-        cout << f << "  flag\n";
 
         //округление и вывод
         num = rounds(num, stoi(roundnum), f, B);
@@ -215,7 +251,7 @@ int main(int argc, char *argv[]) {
             addsub(num1, num2, A, B, roundnum, sign);
         }
 
-        if (sign == "!") {
+        if (sign == "*") {
             mult(num1, num2, A, B, roundnum);
         }
 
@@ -224,5 +260,3 @@ int main(int argc, char *argv[]) {
         }
     }
 }
-
-// 12.9 0 ! 0x96a03 0x1cfabc
